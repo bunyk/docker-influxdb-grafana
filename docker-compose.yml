@@ -21,6 +21,13 @@ services:
         - "3000:3000"
       networks:
         - back-tier
+    frontend:
+      image: nginx
+      container_name: frontend
+      ports:
+        - "8080:80"
+      volumes:
+        - ./frontend:/usr/share/nginx/html
 
 
 networks:
