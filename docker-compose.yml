@@ -4,15 +4,18 @@ services:
       image: influxdb:latest
       container_name: influxdb
       ports:
-        - "8083:8083"
         - "8086:8086"
-        - "8090:8090"
       networks:
         - back-tier
 
     telegraf:
       image: telegraf:latest
       container_name: telegraf
+      volumes:
+        - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      networks:
+        - back-tier
+
 
     grafana:
       image: grafana/grafana:latest
@@ -21,13 +24,6 @@ services:
         - "3000:3000"
       networks:
         - back-tier
-    frontend:
-      image: nginx
-      container_name: frontend
-      ports:
-        - "8080:80"
-      volumes:
-        - ./frontend:/usr/share/nginx/html
 
 
 networks:
