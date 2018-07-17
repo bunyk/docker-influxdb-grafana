@@ -8,6 +8,16 @@ services:
       networks:
         - back-tier
 
+    kapacitor:
+      image: kapacitor:latest
+      container_name: kapacitor
+      ports:
+        - "9092:9092"
+      volumes:
+        - ./kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
+      networks:
+        - back-tier
+             
     telegraf:
       image: telegraf:latest
       container_name: telegraf
@@ -16,7 +26,6 @@ services:
       networks:
         - back-tier
 
-
     grafana:
       image: grafana/grafana:latest
       container_name: grafana
@@ -24,7 +33,6 @@ services:
         - "3000:3000"
       networks:
         - back-tier
-
 
 networks:
   back-tier:
