@@ -26,6 +26,17 @@ services:
       networks:
         - back-tier
 
+    randometric:
+      build:
+          context: .
+          dockerfile: Dockerfile_randometric
+      image: randometric
+      ports:
+        - "8888:8888"
+      networks:
+        - back-tier
+
+
     grafana:
       image: grafana/grafana:latest
       container_name: grafana

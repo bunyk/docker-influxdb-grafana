@@ -1,0 +1,19 @@
+# Build step
+FROM golang:latest as builder
+
+# Set up Golang compiler variables
+ENV GOOS=linux GOARCH=amd64 CGO_ENABLED=0
+
+# Copy source code
+WORKDIR /go/src/app
+RUN go get github.com/bunyk/random_influx
+
+# Main container setup
+FROM alpine:latest
+
+# Use compiled binary from previous step
+COPY --from=builder /go/bin/random_influx /usr/local/bin/
+
+EXPOSE 8888
+
+ENTRYPOINT ["random_influx"]

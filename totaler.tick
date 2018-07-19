@@ -1,0 +1,27 @@
+dbrp "telegraf"."autogen"
+
+var metrics = stream
+    |from()
+        .measurement('http')
+        .where(lambda: "url" == 'http://randometric:8888/metrics-app')
+        .groupBy(*)
+    |window()
+        // Use window every point
+        .everyCount(1)
+        // But two points wide
+        .periodCount(2)
+    // And compute difference by field "Received"
+    |difference('Received')
+        // but don't name it "difference"
+        .as('Received')
+
+var totalByPlatform = metrics
+    |groupBy('Platform')
+    |sum('Received')
+        .as('Received')
+
+totalByPlatform
+    |InfluxDBOut()
+        .database('telegraf')
+        .retentionPolicy('autogen')
+        .measurement('computed_metrics2')
