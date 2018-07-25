@@ -1,27 +1,40 @@
 dbrp "telegraf"."autogen"
 
+// TODO change to 1h or something
+var WINDOW_PERIOD = 30s
+
 var metrics = stream
     |from()
         .measurement('http')
         .where(lambda: "url" == 'http://randometric:8888/metrics-app')
         .groupBy(*)
-    |window()
-        // Use window every point
-        .everyCount(1)
-        // But two points wide
-        .periodCount(2)
-    // And compute difference by field "Received"
     |difference('Received')
-        // but don't name it "difference"
         .as('Received')
+    |window()
+        .period(WINDOW_PERIOD)
+        .every(10s)
 
 var totalByPlatform = metrics
     |groupBy('Platform')
     |sum('Received')
         .as('Received')
+    |httpOut('totalByPlatform')
+
+var totalByAffiliate = metrics
+    |sum('Received')
+        .as('Received')
+    |httpOut('totalByAffiliate')
 
 totalByPlatform
+    |join(totalByAffiliate)
+        .as('total', 'affiliates')
+        .on('Platform')
+        .streamName('affiliate_percent')
+        .fill('null')
+    |httpOut('joinedData')
+    |eval(lambda: "affiliates.Received" / "total.Received" * 100.0)
+        .as('Received_percent')
     |InfluxDBOut()
         .database('telegraf')
         .retentionPolicy('autogen')
-        .measurement('computed_metrics2')
+        .measurement('computed_metrics3')
