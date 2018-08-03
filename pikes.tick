@@ -1,0 +1,14 @@
+dbrp "telegraf"."autogen"
+
+var pikes = stream
+    |from()
+        .measurement('random')
+    |derivative('value')
+        .as('change')
+    |where(lambda: sigma("change") > 3.0)
+    |eval(lambda: 50.0)
+        .as('value')
+    |InfluxDBOut()
+        .database('telegraf')
+        .retentionPolicy('autogen')
+        .measurement('pikes')

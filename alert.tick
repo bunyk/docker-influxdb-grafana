@@ -1,0 +1,9 @@
+stream
+    |from()
+        .measurement('http')
+    |alert()
+        .id('kapacitor/{{ index .Tags "url"}}')
+        .message('PRICE: {{ index .Fields "data_quotes_UAH_price" }}')
+        .info(lambda: TRUE)
+        .post('http://localhost:1440/alert')
+        .post('http://localhost/test.php')
