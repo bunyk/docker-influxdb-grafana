@@ -20,5 +20,4 @@ Install plugin:
 
 ```
 docker exec -it grafana bash
-grafana-cli --pluginUrl https://github.com/ilgizar/ilgizar-candlestick-panel/archive/master.zip plugins install candlestick-panel
 ```

@@ -1,0 +1,11 @@
+dbrp "telegraf"."autogen"
+
+stream
+    |from()
+        .measurement('http')
+    |where(lambda: "url" == 'https://api.coinmarketcap.com/v2/ticker/2/?convert=UAH')
+    @trade()
+    |InfluxDBOut()
+        .database('telegraf')
+        .retentionPolicy('autogen')
+        .measurement('trades')

@@ -13,6 +13,7 @@ services:
     kapacitor:
       image: kapacitor:latest
       container_name: kapacitor
+      command: bash -c "/etc/kapacitor/trader & /entrypoint.sh kapacitord"
       ports:
         - "9092:9092"
       environment:
@@ -20,6 +21,7 @@ services:
         KAPACITOR_INFLUXDB_0_URLS_0: http://influxdb:8086
       volumes:
         - ./kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
+        - ./trader:/etc/kapacitor/trader:ro
       networks:
         - back-tier
              
@@ -37,14 +39,14 @@ services:
         - "8125:8125/udp"
 
     grafana:
-      image: grafana/grafana:latest
+      image: grafana/grafana:5.0.4
       container_name: grafana
       ports:
         - "3000:3000"
+      volumes:
+          - ./data/grafana:/var/lib/grafana
       networks:
         - back-tier
-      volumes:
-        - ./home.json:/usr/share/grafana/public/dashboards/home.json:ro
 
 networks:
     back-tier:
